@@ -88,7 +88,7 @@ export default function EnvelopeOpening({ onOpen }: EnvelopeOpeningProps) {
 
             {/* Highly Thick 3D Dark Amber Wax Seal */}
             <motion.div
-              className="absolute top-[55%] left-1/2 -translate-x-1/2 -translate-y-1/2 z-30 w-24 h-24 rounded-full bg-[#5A1C1D] flex items-center justify-center shadow-[inset_0_4px_12px_rgba(0,0,0,0.6[...]
+              className="absolute top-[55%] left-1/2 -translate-x-1/2 -translate-y-1/2 z-30 w-24 h-24 rounded-full bg-[#5A1C1D] flex items-center justify-center"
               style={{ boxShadow: 'inset 0 6px 15px rgba(0,0,0,0.7), inset 0 -4px 10px rgba(255,255,255,0.1), 0 15px 30px rgba(0,0,0,0.6), 0 5px 15px rgba(201,168,106,0.3)' }}
               animate={isOpen ? { scale: 0, opacity: 0 } : { scale: 1, opacity: 1 }}
               transition={{ duration: 0.6, ease: "easeIn" }}
