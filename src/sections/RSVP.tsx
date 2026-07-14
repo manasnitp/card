@@ -83,6 +83,7 @@ export default function RSVP() {
       </div>
 
       <p className="mt-6 font-inter text-[10px] tracking-[0.3em] text-brand-gold/60 uppercase">With love &amp; joy</p>
+      <p className="mt-2 font-inter text-[12px] tracking-[0.2em] text-brand-gold font-semibold">#AbhigotHisShrey</p>
     </section>
   );
 }
