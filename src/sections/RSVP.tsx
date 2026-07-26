@@ -1,10 +1,12 @@
 "use client";
 
 import { motion } from "framer-motion";
+import SectionDivider from "@/components/SectionDivider";
 
 export default function RSVP() {
   return (
-    <section className="relative z-10 overflow-hidden flex flex-col items-center py-20 px-6 bg-[#fce8e8]">
+    <section className="relative z-10 overflow-hidden flex flex-col items-center pt-20 pb-20 md:pt-40 px-6 bg-[#fce8e8]">
+      <SectionDivider fillColor="#FDFBF7" position="top" />
 
       {/* Top floral divider */}
       <div className="w-full flex items-center justify-center mb-12">

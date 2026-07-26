@@ -2,6 +2,7 @@
 
 import { motion, useScroll, useTransform } from "framer-motion";
 import { invitationData } from "@/data/invitation";
+import SectionDivider from "@/components/SectionDivider";
 
 export default function Hero() {
   const { scrollY } = useScroll();
@@ -15,7 +16,7 @@ export default function Hero() {
   };
 
   return (
-    <section className="relative min-h-[600px] flex flex-col items-center justify-center overflow-hidden py-16">
+    <section className="relative min-h-[600px] flex flex-col items-center justify-center overflow-hidden pt-16 pb-32 md:pb-40">
       {/* Cinematic Parallax Background with Slow Zoom */}
       <motion.div
         className="absolute inset-0 z-0 bg-[url('https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&q=80&w=1000')] bg-cover bg-center transform-gpu will-change-transform"
@@ -148,6 +149,7 @@ export default function Hero() {
         </motion.p>
 
       </div>
+      <SectionDivider fillColor="#FDFBF7" position="bottom" />
     </section>
   );
 }

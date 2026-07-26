@@ -9,106 +9,177 @@ interface EnvelopeOpeningProps {
 }
 
 export default function EnvelopeOpening({ onOpen }: EnvelopeOpeningProps) {
-  const [isOpen, setIsOpen] = useState(false);
-  const [isRemoving, setIsRemoving] = useState(false);
+  // 0: Closed, 1: Flap Opening, 2: Letter Pulls Out / Envelope Drops, 3: Letter Expands
+  const [step, setStep] = useState<0 | 1 | 2 | 3>(0);
+  const [lights, setLights] = useState<{ id: number; x: number; y: number; scale: number; duration: number; rotation: number }[]>([]);
 
   const handleOpen = () => {
-    if (isOpen) return;
-    setIsOpen(true);
+    if (step > 0) return;
+    setStep(1); // Flap opens
 
-    // Sequence: Flap opens with magic edge glow -> envelope scales up & fades -> trigger main content
+    // Generate elegant magical light drift
+    setLights(
+      Array.from({ length: 40 }).map((_, i) => ({
+        id: i,
+        x: (Math.random() - 0.5) * 500, 
+        y: -100 - Math.random() * 500,  
+        scale: Math.random() * 1.5 + 0.5, 
+        duration: Math.random() * 2 + 2, 
+        rotation: Math.random() * 360,
+      }))
+    );
+
     setTimeout(() => {
-      setIsRemoving(true);
+      setStep(2); // Letter pulls out, envelope drops
+      
       setTimeout(() => {
-        onOpen();
-      }, 1200);
-    }, 1800);
+        setStep(3); // Letter expands
+        
+        setTimeout(() => {
+          onOpen();
+        }, 1000);
+      }, 1500);
+    }, 1200);
   };
+
+  const envelopeAnim = 
+    step === 0 ? { y: 0, rotateX: 0, opacity: 1, scale: 1 } :
+    step === 1 ? { y: 15, rotateX: 5, opacity: 1, scale: 1.02 } :
+    { y: 800, rotateX: 20, opacity: 0, scale: 0.8 };
+
+  const letterAnim = 
+    step === 0 ? { y: 0, scale: 1, opacity: 1 } :
+    step === 1 ? { y: -20, scale: 1, opacity: 1 } :
+    step === 2 ? { y: -80, scale: 1.15, opacity: 1 } :
+    { y: -80, scale: 8, opacity: 0 };
 
   return (
     <AnimatePresence>
-      {!isRemoving && (
+      {step < 3 && (
         <motion.div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-[#C9A86A]"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-[#C9A86A] overflow-hidden"
           initial={{ opacity: 1 }}
-          exit={{ opacity: 0, scale: 20 }}
-          transition={{ duration: 1.5, ease: [0.8, 0, 0.2, 1] }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 1 }}
           onClick={handleOpen}
         >
-          {/* Blinding Light Flash on exit */}
-          <motion.div
-            className="absolute inset-0 bg-brand-gold z-50 pointer-events-none mix-blend-screen"
-            initial={{ opacity: 0 }}
-            animate={isRemoving ? { opacity: 1 } : { opacity: 0 }}
-            transition={{ duration: 1 }}
-          />
-
           {/* Subtle Ambient Lighting */}
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-brand-gold/15 via-transparent to-transparent pointer-events-none" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-brand-gold/20 via-transparent to-transparent pointer-events-none mix-blend-overlay" />
 
-          {/* Envelope Container */}
-          <motion.div
-            className="relative w-[320px] h-[480px] md:w-[400px] md:h-[600px] cursor-pointer perspective-[2000px] z-10"
-            style={{ transformStyle: "preserve-3d" }}
-            animate={isOpen ? { scale: 1.1, y: -20, rotateX: 5 } : { scale: 1, y: 0, rotateX: 0 }}
-            transition={{ duration: 1.5, ease: "easeInOut" }}
-          >
-            {/* Back of Envelope */}
-            <div className="absolute inset-0 bg-[#EFE3D0] rounded-lg shadow-2xl overflow-hidden border border-brand-gold/20" />
-
-            {/* Floral Embossed Borders */}
-            <FloralBorder className="left-0 w-16 md:w-20 text-[#E2D4BB]" />
-            <FloralBorder className="right-0 w-16 md:w-20 text-[#E2D4BB] scale-x-[-1]" />
-
-            {/* Inner Golden Glow (revealed when flap opens) */}
-            <motion.div
-              className="absolute inset-0 top-0 h-[40%] bg-gradient-to-b from-brand-gold/80 via-brand-gold/20 to-transparent blur-xl z-10"
-              initial={{ opacity: 0 }}
-              animate={isOpen ? { opacity: 1 } : { opacity: 0 }}
-              transition={{ duration: 1, delay: 0.2 }}
+          {/* Container for absolute positioning */}
+          <div className="relative w-[320px] h-[480px] md:w-[400px] md:h-[600px] perspective-[2000px]">
+            
+            {/* Envelope Inside Back */}
+            <motion.div 
+              className="absolute inset-0 bg-[#EFE3D0] rounded-lg shadow-2xl border border-brand-gold/20 z-0 transform-gpu will-change-transform"
+              animate={envelopeAnim}
+              transition={{ duration: 1.5, ease: "easeInOut" }}
             />
 
-            {/* Bottom Flap with glowing edges when open */}
+            {/* The Letter */}
             <motion.div
-              className="absolute bottom-0 w-full h-[60%] bg-[#FDFBF7] rounded-b-lg border-t border-brand-gold/10 z-10 drop-shadow-[0_-5px_10px_rgba(0,0,0,0.05)]"
-              style={{ clipPath: "polygon(0 100%, 50% 0, 100% 100%)" }}
-              animate={isOpen ? { filter: "drop-shadow(0 -4px 10px rgba(201,168,106,0.6))" } : { filter: "drop-shadow(0 0px 0px rgba(0,0,0,0))" }}
-              transition={{ duration: 1 }}
+              className="absolute inset-3 md:inset-4 bg-[#FDFBF7] rounded shadow-lg border border-brand-gold/30 z-10 flex flex-col items-center justify-center p-6 md:p-8 transform-gpu will-change-transform"
+              animate={letterAnim}
+              transition={{ duration: 1.5, ease: "easeInOut" }}
+            >
+              <div className="w-full h-full border border-brand-gold/40 p-4 flex flex-col items-center justify-center gap-6 relative overflow-hidden">
+                <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cream-paper.png')] opacity-50 mix-blend-multiply pointer-events-none" />
+                <span className="font-playfair text-brand-gold text-5xl md:text-6xl italic z-10 drop-shadow-sm">S <span className="font-vibes text-4xl">&</span> A</span>
+                <span className="font-inter text-[10px] md:text-xs tracking-[0.3em] text-brand-text/60 uppercase z-10 text-center">You are invited</span>
+              </div>
+            </motion.div>
+
+            {/* Envelope Front Flaps */}
+            <motion.div 
+              className="absolute inset-0 z-20 pointer-events-none transform-gpu will-change-transform"
+              animate={envelopeAnim}
+              transition={{ duration: 1.5, ease: "easeInOut" }}
+            >
+              {/* Left Flap (Tan + Floral Border) */}
+              <div
+                className="absolute inset-0 bg-[#EFE3D0] rounded-l-lg pointer-events-auto"
+                style={{ clipPath: "polygon(0 0, 50% 50%, 0 100%)" }}
+              >
+                <FloralBorder className="absolute left-0 w-16 md:w-20 text-[#E2D4BB]" />
+              </div>
+
+              {/* Right Flap (Tan + Floral Border) */}
+              <div
+                className="absolute inset-0 bg-[#EFE3D0] rounded-r-lg pointer-events-auto"
+                style={{ clipPath: "polygon(100% 0, 100% 100%, 50% 50%)" }}
+              >
+                <FloralBorder className="absolute right-0 w-16 md:w-20 text-[#E2D4BB] scale-x-[-1]" />
+              </div>
+
+              {/* Inner Golden Glow (revealed when flap opens) */}
+              <motion.div
+                className="absolute inset-0 top-0 h-[40%] bg-gradient-to-b from-brand-gold/60 via-brand-gold/10 to-transparent blur-xl z-20 pointer-events-none"
+                initial={{ opacity: 0 }}
+                animate={step > 0 ? { opacity: 1 } : { opacity: 0 }}
+                transition={{ duration: 1, delay: 0.2 }}
+              />
+
+              {/* Bottom Flap (Cream) */}
+              <div
+                className="absolute bottom-0 w-full h-[60%] bg-[#FDFBF7] rounded-b-lg border-t border-brand-gold/10 z-20 drop-shadow-[0_-5px_10px_rgba(0,0,0,0.05)] pointer-events-auto flex items-end justify-center pb-8 md:pb-12"
+                style={{ clipPath: "polygon(0 100%, 50% 0, 100% 100%)" }}
+              >
+                <span className="font-inter text-[10px] md:text-xs tracking-[0.2em] text-brand-gold font-medium uppercase drop-shadow-sm">#AbhigotHisShrey</span>
+              </div>
+
+              {/* Top Flap (Animated Cream) */}
+              <motion.div
+                className="absolute top-0 w-full h-[55%] bg-[#FDFBF7] rounded-t-lg origin-top z-30 flex justify-center items-end pb-8 drop-shadow-[0_10px_20px_rgba(0,0,0,0.15)] pointer-events-auto cursor-pointer"
+                style={{ clipPath: "polygon(0 0, 100% 0, 50% 100%)" }}
+                animate={step > 0 ? { rotateX: 180, zIndex: 15, filter: "drop-shadow(0 -10px 15px rgba(201,168,106,0.3))" } : { rotateX: 0 }}
+                transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
+              >
+                <div className="absolute inset-0 bg-gradient-to-b from-brand-gold/5 to-transparent pointer-events-none" />
+              </motion.div>
+
+              {/* Wax Seal */}
+              <motion.div
+                className="absolute top-[55%] left-1/2 -translate-x-1/2 -translate-y-1/2 z-40 w-24 h-24 rounded-full bg-[#5A1C1D] flex items-center justify-center pointer-events-auto cursor-pointer"
+                style={{ boxShadow: 'inset 0 6px 15px rgba(0,0,0,0.7), inset 0 -4px 10px rgba(255,255,255,0.1), 0 15px 30px rgba(0,0,0,0.6), 0 5px 15px rgba(201,168,106,0.3)' }}
+                animate={step > 0 ? { scale: 0, opacity: 0 } : { scale: 1, opacity: 1 }}
+                transition={{ duration: 0.6, ease: "easeIn" }}
+              >
+                <div className="absolute inset-2 border-2 border-brand-gold/70 rounded-full pointer-events-none opacity-80 mix-blend-overlay" />
+                <span className="font-playfair italic text-brand-gold text-3xl drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] pr-1 font-semibold">
+                  S <span className="font-vibes text-3xl font-normal">&</span> A
+                </span>
+              </motion.div>
+
+              {/* "TAP TO OPEN" Text */}
+              <motion.div
+                className="absolute -bottom-16 left-0 right-0 text-center z-40"
+                animate={step > 0 ? { opacity: 0 } : { opacity: 0.8 }}
+              >
+                <span className="font-inter text-sm tracking-[0.4em] text-[#FDFBF7] uppercase drop-shadow-md">Tap to open</span>
+              </motion.div>
+            </motion.div>
+          </div>
+
+          {/* Elegant Magical Sparkles */}
+          {step > 0 && lights.map((light) => (
+            <motion.div
+              key={light.id}
+              className="absolute top-[40%] left-1/2 w-4 h-4 bg-brand-gold/80 rounded-full mix-blend-screen pointer-events-none z-[60]"
+              style={{ 
+                filter: "blur(3px)", 
+                boxShadow: "0 0 15px 5px rgba(201,168,106,0.8), 0 0 30px 10px rgba(201,168,106,0.4)" 
+              }}
+              initial={{ x: "-50%", y: 0, opacity: 0, scale: 0 }}
+              animate={{ 
+                x: `calc(-50% + ${light.x}px)`, 
+                y: light.y, 
+                opacity: [0, 1, 0.8, 0], 
+                scale: light.scale,
+                rotate: light.rotation
+              }}
+              transition={{ duration: light.duration, ease: "easeInOut" }}
             />
-
-            {/* Top Flap (Animated) with edge glow */}
-            <motion.div
-              className="absolute top-0 w-full h-[55%] bg-[#FDFBF7] rounded-t-lg origin-top z-20 flex justify-center items-end pb-8 drop-shadow-[0_10px_20px_rgba(0,0,0,0.1)]"
-              style={{ clipPath: "polygon(0 0, 100% 0, 50% 100%)" }}
-              animate={isOpen ? { rotateX: 180, zIndex: 0, filter: "drop-shadow(0 -10px 15px rgba(201,168,106,0.4))" } : { rotateX: 0, filter: "drop-shadow(0 10px 15px rgba(0,0,0,0.15))" }}
-              transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
-            >
-              <div className="absolute inset-0 bg-gradient-to-b from-brand-gold/5 to-transparent pointer-events-none" />
-            </motion.div>
-
-            {/* Highly Thick 3D Dark Amber Wax Seal */}
-            <motion.div
-              className="absolute top-[55%] left-1/2 -translate-x-1/2 -translate-y-1/2 z-30 w-24 h-24 rounded-full bg-[#5A1C1D] flex items-center justify-center"
-              style={{ boxShadow: 'inset 0 6px 15px rgba(0,0,0,0.7), inset 0 -4px 10px rgba(255,255,255,0.1), 0 15px 30px rgba(0,0,0,0.6), 0 5px 15px rgba(201,168,106,0.3)' }}
-              animate={isOpen ? { scale: 0, opacity: 0 } : { scale: 1, opacity: 1 }}
-              transition={{ duration: 0.6, ease: "easeIn" }}
-            >
-              {/* Inner gold ring */}
-              <div className="absolute inset-2 border-2 border-brand-gold/70 rounded-full pointer-events-none opacity-80 mix-blend-overlay" />
-              {/* Couple Initials */}
-              <span className="font-playfair italic text-brand-gold text-3xl drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] pr-1 font-semibold">
-                S <span className="font-vibes text-3xl font-normal">&</span> A
-              </span>
-            </motion.div>
-
-            {/* "TAP TO OPEN" Text */}
-            <motion.div
-              className="absolute -bottom-16 left-0 right-0 text-center z-30"
-              animate={isOpen ? { opacity: 0 } : { opacity: 0.8 }}
-            >
-              <span className="font-inter text-sm tracking-[0.4em] text-[#FDFBF7] uppercase">Tap to open</span>
-            </motion.div>
-          </motion.div>
+          ))}
         </motion.div>
       )}
     </AnimatePresence>

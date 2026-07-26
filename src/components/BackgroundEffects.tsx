@@ -3,6 +3,13 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 
+const HeartIcon = ({ className, style }: { className?: string, style?: React.CSSProperties }) => (
+  <svg className={className} style={style} viewBox="0 0 32 29.6" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+    <path d="M23.6,0c-3.4,0-6.3,2.7-7.6,5.6C14.7,2.7,11.8,0,8.4,0C3.8,0,0,3.8,0,8.4c0,9.4,9.5,11.9,16,21.2
+	c6.1-9.3,16-12.1,16-21.2C32,3.8,28.2,0,23.6,0z"/>
+  </svg>
+);
+
 export default function BackgroundEffects() {
   const [mounted, setMounted] = useState(false);
   const [particles] = useState(() => 
@@ -17,15 +24,16 @@ export default function BackgroundEffects() {
     }))
   );
 
-  const [petals] = useState(() => 
-    Array.from({ length: 12 }).map((_, i) => ({
-      id: `petal-${i}`,
+  const [hearts] = useState(() => 
+    Array.from({ length: 15 }).map((_, i) => ({
+      id: `heart-${i}`,
       x: Math.random() * 100,
       y: Math.random() * 100,
       size: Math.random() * 15 + 10,
-      duration: Math.random() * 15 + 15,
-      delay: Math.random() * 10,
-      rotation: Math.random() * 360,
+      duration: Math.random() * 20 + 15,
+      delay: Math.random() * 15,
+      rotation: Math.random() * 30 - 15,
+      targetRotation: Math.random() > 0.5 ? 30 : -30,
       xEnd: Math.random() * 20 - 10,
     }))
   );
@@ -57,27 +65,28 @@ export default function BackgroundEffects() {
         />
       ))}
 
-      {/* Floating Petals */}
-      {petals.map((p) => (
+      {/* Floating Hearts */}
+      {hearts.map((h) => (
         <motion.div
-          key={p.id}
-          className="absolute bg-white/20 backdrop-blur-sm shadow-[0_4px_10px_rgba(0,0,0,0.05)]"
+          key={h.id}
+          className="absolute text-brand-gold/30 transform-gpu will-change-transform"
           style={{ 
-            width: p.size, 
-            height: p.size * 1.5, 
-            left: `${p.x}%`, 
-            top: `${p.y}%`,
-            borderRadius: "50% 0 50% 50%",
-            filter: "drop-shadow(0 2px 4px rgba(216,164,143,0.3))"
+            width: h.size, 
+            height: h.size, 
+            left: `${h.x}%`, 
+            top: `${h.y}%`,
+            filter: "drop-shadow(0 2px 4px rgba(201,168,106,0.3))"
           }}
           animate={{ 
-            y: ["0vh", "100vh"], 
-            x: ["0vw", `${p.xEnd}vw`],
-            rotate: [p.rotation, p.rotation + 360],
+            y: ["0vh", "-100vh"], 
+            x: ["0vw", `${h.xEnd}vw`],
+            rotate: [h.rotation, h.rotation + h.targetRotation],
             opacity: [0, 0.6, 0] 
           }}
-          transition={{ duration: p.duration, repeat: Infinity, delay: p.delay, ease: "linear" }}
-        />
+          transition={{ duration: h.duration, repeat: Infinity, delay: h.delay, ease: "linear" }}
+        >
+          <HeartIcon className="w-full h-full" />
+        </motion.div>
       ))}
       
       <div className="absolute inset-0 bg-gradient-to-b from-brand-bg/0 via-brand-bg/40 to-brand-bg pointer-events-none" />

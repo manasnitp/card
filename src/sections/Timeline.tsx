@@ -1,9 +1,20 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { useRef } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { invitationData } from "@/data/invitation";
 
 export default function Timeline() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start center", "end center"]
+  });
+
+  // Calculate the flower's Y position to track scroll progress exactly
+  const flowerY = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
+
   return (
     <section className="py-24 px-6 bg-brand-bg relative z-10">
       <div className="max-w-6xl mx-auto">
@@ -17,19 +28,32 @@ export default function Timeline() {
           <p className="font-inter text-xs tracking-[0.2em] uppercase text-brand-gold">Order of Events</p>
         </motion.div>
 
-        <div className="relative">
+        <div className="relative" ref={containerRef}>
           {/* Vertical Line Background */}
-          <div className="absolute left-6 md:left-1/2 md:-translate-x-1/2 top-0 bottom-0 w-[2px] bg-brand-gold/10" />
+          <div className="absolute left-6 md:left-1/2 md:-translate-x-1/2 top-0 bottom-0 w-[2px] bg-brand-gold/20" />
           
-          {/* Vertical Line Animated Progress */}
+          {/* Vertical Line Animated Progress (Scroll Linked) */}
           <motion.div 
-            className="absolute left-6 md:left-1/2 md:-translate-x-1/2 top-0 w-[2px] bg-gradient-to-b from-brand-gold via-brand-gold to-transparent origin-top"
-            initial={{ scaleY: 0 }}
-            whileInView={{ scaleY: 1 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 2, ease: [0.16, 1, 0.3, 1] }}
-            style={{ height: "100%" }}
+            className="absolute left-6 md:left-1/2 md:-translate-x-1/2 top-0 w-[2px] bg-brand-gold origin-top"
+            style={{ height: "100%", scaleY: scrollYProgress }}
           />
+
+          {/* Scrolling Flower Icon Tracker */}
+          <motion.div
+            className="absolute left-6 md:left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 flex items-center justify-center w-8 h-8 pointer-events-none"
+            style={{ top: flowerY }}
+          >
+             <span 
+               className="text-2xl animate-spin drop-shadow-md" 
+               style={{ 
+                 animationDuration: '12s', 
+                 lineHeight: 1,
+                 fontFamily: '"Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif'
+               }}
+             >
+               🌸
+             </span>
+          </motion.div>
 
           {invitationData.timeline.map((event, index) => {
             const isEven = index % 2 === 0;
