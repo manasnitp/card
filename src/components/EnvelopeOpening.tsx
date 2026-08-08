@@ -21,37 +21,39 @@ export default function EnvelopeOpening({ onOpen }: EnvelopeOpeningProps) {
     setLights(
       Array.from({ length: 40 }).map((_, i) => ({
         id: i,
-        x: (Math.random() - 0.5) * 500, 
-        y: -100 - Math.random() * 500,  
-        scale: Math.random() * 1.5 + 0.5, 
-        duration: Math.random() * 2 + 2, 
+        x: (Math.random() - 0.5) * 500,
+        y: -100 - Math.random() * 500,
+        scale: Math.random() * 1.5 + 0.5,
+        duration: Math.random() * 2 + 2,
         rotation: Math.random() * 360,
       }))
     );
 
     setTimeout(() => {
       setStep(2); // Letter pulls out, envelope drops
-      
+
       setTimeout(() => {
         setStep(3); // Letter expands
-        
+
         setTimeout(() => {
           onOpen();
         }, 1000);
-      }, 1500);
-    }, 1200);
+      }, 5000); // Increased reading time
+    }, 1000); // Trigger pull out just before flap finishes opening
   };
 
-  const envelopeAnim = 
+  const envelopeAnim =
     step === 0 ? { y: 0, rotateX: 0, opacity: 1, scale: 1 } :
-    step === 1 ? { y: 15, rotateX: 5, opacity: 1, scale: 1.02 } :
-    { y: 800, rotateX: 20, opacity: 0, scale: 0.8 };
+      step === 1 ? { y: 10, rotateX: 5, opacity: 1, scale: 1.01 } :
+        { y: 1000, rotateX: 20, opacity: 0, scale: 0.8 };
 
-  const letterAnim = 
-    step === 0 ? { y: 0, scale: 1, opacity: 1 } :
-    step === 1 ? { y: -20, scale: 1, opacity: 1 } :
-    step === 2 ? { y: -80, scale: 1.15, opacity: 1 } :
-    { y: -80, scale: 8, opacity: 0 };
+  const letterAnim =
+    step === 0 ? { y: 0, scale: 0.95, opacity: 1 } :
+      step === 1 ? { y: -10, scale: 0.95, opacity: 1 } :
+        step === 2 ? { y: -50, scale: 1.15, opacity: 1, zIndex: 30 } :
+          { y: 0, scale: 20, opacity: 0 };
+
+  const smoothTransition = { duration: 1.8, ease: [0.33, 1, 0.68, 1] };
 
   return (
     <AnimatePresence>
@@ -68,24 +70,44 @@ export default function EnvelopeOpening({ onOpen }: EnvelopeOpeningProps) {
 
           {/* Container for absolute positioning */}
           <div className="relative w-[320px] h-[480px] md:w-[400px] md:h-[600px] perspective-[2000px]">
-            
+
             {/* Envelope Inside Back */}
-            <motion.div 
+            <motion.div
               className="absolute inset-0 bg-[#EFE3D0] rounded-lg shadow-2xl border border-brand-gold/20 z-0 transform-gpu will-change-transform"
               animate={envelopeAnim}
-              transition={{ duration: 1.5, ease: "easeInOut" }}
+              transition={smoothTransition}
             />
 
             {/* The Letter */}
             <motion.div
               className="absolute inset-3 md:inset-4 bg-[#FDFBF7] rounded shadow-lg border border-brand-gold/30 z-10 flex flex-col items-center justify-center p-6 md:p-8 transform-gpu will-change-transform"
               animate={letterAnim}
-              transition={{ duration: 1.5, ease: "easeInOut" }}
+              transition={smoothTransition}
             >
-              <div className="w-full h-full border border-brand-gold/40 p-4 flex flex-col items-center justify-center gap-6 relative overflow-hidden">
+              <div className="w-full h-full border border-brand-gold/40 p-4 flex flex-col items-center justify-center gap-2 md:gap-3 relative overflow-hidden">
                 <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cream-paper.png')] opacity-50 mix-blend-multiply pointer-events-none" />
-                <span className="font-playfair text-brand-gold text-5xl md:text-6xl italic z-10 drop-shadow-sm">S <span className="font-vibes text-4xl">&</span> A</span>
-                <span className="font-inter text-[10px] md:text-xs tracking-[0.3em] text-brand-text/60 uppercase z-10 text-center">You are invited</span>
+                
+                <span className="text-[#9B1B30] text-2xl md:text-3xl mb-1 z-10 drop-shadow-sm">
+                  ॐ
+                </span>
+                
+                <span className="font-playfair font-semibold text-brand-gold text-sm md:text-base z-10 drop-shadow-sm text-center px-4 leading-tight tracking-widest mt-1">
+                  ॥ श्री श्री प्रजापतये नमः ॥
+                </span>
+                
+                <span className="font-vibes text-brand-gold text-2xl md:text-3xl z-10 drop-shadow-sm text-center px-4 leading-tight mt-1">
+                  Shree Shree Prajapataya Namah
+                </span>
+
+                <div className="w-8 h-[1px] bg-brand-gold/30 my-2 z-10" />
+
+                <span className="font-inter text-[9px] md:text-[10px] tracking-[0.2em] text-brand-text/70 uppercase z-10 text-center px-2 max-w-[220px] leading-relaxed">
+                  You are cordially invited to join the wedding of
+                </span>
+
+                <span className="font-playfair text-brand-text text-xl md:text-2xl font-medium italic z-10 drop-shadow-sm text-center mt-1">
+                  Shreya <span className="font-vibes text-brand-gold text-3xl mx-1">&</span> Abhishek
+                </span>
               </div>
             </motion.div>
 
@@ -93,7 +115,7 @@ export default function EnvelopeOpening({ onOpen }: EnvelopeOpeningProps) {
             <motion.div 
               className="absolute inset-0 z-20 pointer-events-none transform-gpu will-change-transform"
               animate={envelopeAnim}
-              transition={{ duration: 1.5, ease: "easeInOut" }}
+              transition={smoothTransition}
             >
               {/* Left Flap (Tan + Floral Border) */}
               <div
@@ -132,7 +154,7 @@ export default function EnvelopeOpening({ onOpen }: EnvelopeOpeningProps) {
                 className="absolute top-0 w-full h-[55%] bg-[#FDFBF7] rounded-t-lg origin-top z-30 flex justify-center items-end pb-8 drop-shadow-[0_10px_20px_rgba(0,0,0,0.15)] pointer-events-auto cursor-pointer"
                 style={{ clipPath: "polygon(0 0, 100% 0, 50% 100%)" }}
                 animate={step > 0 ? { rotateX: 180, zIndex: 15, filter: "drop-shadow(0 -10px 15px rgba(201,168,106,0.3))" } : { rotateX: 0 }}
-                transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
+                transition={{ duration: 1.5, ease: [0.33, 1, 0.68, 1] }}
               >
                 <div className="absolute inset-0 bg-gradient-to-b from-brand-gold/5 to-transparent pointer-events-none" />
               </motion.div>
@@ -165,21 +187,22 @@ export default function EnvelopeOpening({ onOpen }: EnvelopeOpeningProps) {
             <motion.div
               key={light.id}
               className="absolute top-[40%] left-1/2 w-4 h-4 bg-brand-gold/80 rounded-full mix-blend-screen pointer-events-none z-[60]"
-              style={{ 
-                filter: "blur(3px)", 
-                boxShadow: "0 0 15px 5px rgba(201,168,106,0.8), 0 0 30px 10px rgba(201,168,106,0.4)" 
+              style={{
+                filter: "blur(3px)",
+                boxShadow: "0 0 15px 5px rgba(201,168,106,0.8), 0 0 30px 10px rgba(201,168,106,0.4)"
               }}
               initial={{ x: "-50%", y: 0, opacity: 0, scale: 0 }}
-              animate={{ 
-                x: `calc(-50% + ${light.x}px)`, 
-                y: light.y, 
-                opacity: [0, 1, 0.8, 0], 
+              animate={{
+                x: `calc(-50% + ${light.x}px)`,
+                y: light.y,
+                opacity: [0, 1, 0.8, 0],
                 scale: light.scale,
                 rotate: light.rotation
               }}
               transition={{ duration: light.duration, ease: "easeInOut" }}
             />
           ))}
+
         </motion.div>
       )}
     </AnimatePresence>
