@@ -53,7 +53,7 @@ export default function EnvelopeOpening({ onOpen }: EnvelopeOpeningProps) {
         step === 2 ? { y: -50, scale: 1.15, opacity: 1, zIndex: 30 } :
           { y: 0, scale: 20, opacity: 0 };
 
-  const smoothTransition = { duration: 1.8, ease: [0.33, 1, 0.68, 1] };
+  const smoothTransition = { duration: 1.8, ease: [0.33, 1, 0.68, 1] as [number, number, number, number] };
 
   return (
     <AnimatePresence>
@@ -154,7 +154,7 @@ export default function EnvelopeOpening({ onOpen }: EnvelopeOpeningProps) {
                 className="absolute top-0 w-full h-[55%] bg-[#FDFBF7] rounded-t-lg origin-top z-30 flex justify-center items-end pb-8 drop-shadow-[0_10px_20px_rgba(0,0,0,0.15)] pointer-events-auto cursor-pointer"
                 style={{ clipPath: "polygon(0 0, 100% 0, 50% 100%)" }}
                 animate={step > 0 ? { rotateX: 180, zIndex: 15, filter: "drop-shadow(0 -10px 15px rgba(201,168,106,0.3))" } : { rotateX: 0 }}
-                transition={{ duration: 1.5, ease: [0.33, 1, 0.68, 1] }}
+                transition={{ duration: 1.5, ease: [0.33, 1, 0.68, 1] as [number, number, number, number] }}
               >
                 <div className="absolute inset-0 bg-gradient-to-b from-brand-gold/5 to-transparent pointer-events-none" />
               </motion.div>
