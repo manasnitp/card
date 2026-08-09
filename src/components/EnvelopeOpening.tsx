@@ -17,9 +17,9 @@ export default function EnvelopeOpening({ onOpen }: EnvelopeOpeningProps) {
     if (step > 0) return;
     setStep(1); // Flap opens
 
-    // Generate elegant magical light drift
+    // Generate elegant magical light drift (reduced count for performance)
     setLights(
-      Array.from({ length: 40 }).map((_, i) => ({
+      Array.from({ length: 15 }).map((_, i) => ({
         id: i,
         x: (Math.random() - 0.5) * 500,
         y: -100 - Math.random() * 500,
@@ -51,7 +51,7 @@ export default function EnvelopeOpening({ onOpen }: EnvelopeOpeningProps) {
     step === 0 ? { y: 0, scale: 0.95, opacity: 1 } :
       step === 1 ? { y: -10, scale: 0.95, opacity: 1 } :
         step === 2 ? { y: -50, scale: 1.15, opacity: 1, zIndex: 30 } :
-          { y: 0, scale: 20, opacity: 0 };
+          { y: 0, scale: 8, opacity: 0 }; // Reduced scale to prevent texture explosion lag
 
   const smoothTransition = { duration: 1.8, ease: [0.33, 1, 0.68, 1] as [number, number, number, number] };
 
@@ -65,8 +65,8 @@ export default function EnvelopeOpening({ onOpen }: EnvelopeOpeningProps) {
           transition={{ duration: 1 }}
           onClick={handleOpen}
         >
-          {/* Subtle Ambient Lighting */}
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-brand-gold/20 via-transparent to-transparent pointer-events-none mix-blend-overlay" />
+          {/* Subtle Ambient Lighting - Removed mix-blend-overlay for performance */}
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-brand-gold/10 via-transparent to-transparent pointer-events-none" />
 
           {/* Container for absolute positioning */}
           <div className="relative w-[320px] h-[480px] md:w-[400px] md:h-[600px] perspective-[2000px]">
@@ -153,7 +153,7 @@ export default function EnvelopeOpening({ onOpen }: EnvelopeOpeningProps) {
               <motion.div
                 className="absolute top-0 w-full h-[55%] bg-[#FDFBF7] rounded-t-lg origin-top z-30 flex justify-center items-end pb-8 drop-shadow-[0_10px_20px_rgba(0,0,0,0.15)] pointer-events-auto cursor-pointer"
                 style={{ clipPath: "polygon(0 0, 100% 0, 50% 100%)" }}
-                animate={step > 0 ? { rotateX: 180, zIndex: 15, filter: "drop-shadow(0 -10px 15px rgba(201,168,106,0.3))" } : { rotateX: 0 }}
+                animate={step > 0 ? { rotateX: 180, zIndex: 15 } : { rotateX: 0 }}
                 transition={{ duration: 1.5, ease: [0.33, 1, 0.68, 1] as [number, number, number, number] }}
               >
                 <div className="absolute inset-0 bg-gradient-to-b from-brand-gold/5 to-transparent pointer-events-none" />
@@ -186,10 +186,9 @@ export default function EnvelopeOpening({ onOpen }: EnvelopeOpeningProps) {
           {step > 0 && lights.map((light) => (
             <motion.div
               key={light.id}
-              className="absolute top-[40%] left-1/2 w-4 h-4 bg-brand-gold/80 rounded-full mix-blend-screen pointer-events-none z-[60]"
+              className="absolute top-[40%] left-1/2 w-3 h-3 bg-brand-gold/80 rounded-full mix-blend-screen pointer-events-none z-[60]"
               style={{
-                filter: "blur(3px)",
-                boxShadow: "0 0 15px 5px rgba(201,168,106,0.8), 0 0 30px 10px rgba(201,168,106,0.4)"
+                boxShadow: "0 0 10px 3px rgba(201,168,106,0.8), 0 0 20px 5px rgba(201,168,106,0.4)"
               }}
               initial={{ x: "-50%", y: 0, opacity: 0, scale: 0 }}
               animate={{
