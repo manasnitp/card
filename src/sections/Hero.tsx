@@ -10,11 +10,6 @@ export default function Hero() {
 
   const { partner1, partner2 } = invitationData.couple;
 
-  const itemAnimation = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] as const } },
-  };
-
   return (
     <section className="relative min-h-[600px] flex flex-col items-center justify-center overflow-hidden pt-16 pb-32 md:pb-40">
       {/* Cinematic Parallax Background with Slow Zoom */}
@@ -139,14 +134,6 @@ export default function Hero() {
             )}
           </div>
         </div>
-
-        <motion.p variants={itemAnimation} className="mt-10 font-cormorant text-xl md:text-2xl tracking-widest text-brand-text/80">
-          {invitationData.weddingDateFormatted}
-        </motion.p>
-
-        <motion.p variants={itemAnimation} className="mt-2 mb-12 font-inter text-xs tracking-[0.2em] uppercase text-brand-gold/80">
-          {invitationData.weddingLocation}
-        </motion.p>
 
       </div>
       <SectionDivider fillColor="#FDFBF7" position="bottom" />
