@@ -22,7 +22,7 @@ const BubbleIcon = ({ className, style }: { className?: string, style?: React.CS
 export default function BackgroundEffects() {
   const [mounted, setMounted] = useState(false);
   const [particles] = useState(() => 
-    Array.from({ length: 30 }).map((_, i) => ({
+    Array.from({ length: 24 }).map((_, i) => ({
       id: i,
       x: Math.random() * 100,
       y: Math.random() * 100,
@@ -34,7 +34,7 @@ export default function BackgroundEffects() {
   );
 
   const [hearts] = useState(() => 
-    Array.from({ length: 22 }).map((_, i) => ({
+    Array.from({ length: 18 }).map((_, i) => ({
       id: `heart-${i}`,
       x: Math.random() * 100,
       y: Math.random() * 100,
@@ -48,7 +48,7 @@ export default function BackgroundEffects() {
   );
 
   const [bubbles] = useState(() =>
-    Array.from({ length: 28 }).map((_, i) => ({
+    Array.from({ length: 22 }).map((_, i) => ({
       id: `bubble-${i}`,
       x: Math.random() * 100,
       y: Math.random() * 100,
