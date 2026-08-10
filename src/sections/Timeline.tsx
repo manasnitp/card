@@ -1,9 +1,31 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { useRef, useState } from "react";
+import { motion, useScroll, useTransform, useMotionValueEvent } from "framer-motion";
 import { invitationData } from "@/data/invitation";
 
 export default function Timeline() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+  
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start center", "end center"]
+  });
+
+  useMotionValueEvent(scrollYProgress, "change", (latest) => {
+    const index = Math.round(latest * (invitationData.timeline.length - 1));
+    setActiveIndex(index);
+  });
+
+  const getProgress = (index: number, total: number) => {
+    if (total <= 1) return 1;
+    // The first dot is approx 8% down the container, the last is approx 98% down.
+    const start = 0.08;
+    const end = 0.98;
+    return start + (index / (total - 1)) * (end - start);
+  };
+
   return (
     <section className="py-24 px-6 bg-brand-bg relative z-10">
       <div className="max-w-6xl mx-auto">
@@ -17,18 +39,23 @@ export default function Timeline() {
           <p className="font-inter text-xs tracking-[0.2em] uppercase text-brand-gold">Order of Events</p>
         </motion.div>
 
-        <div className="relative">
+        <div className="relative" ref={containerRef}>
           {/* Vertical Line Background */}
-          <div className="absolute left-6 md:left-1/2 md:-translate-x-1/2 top-0 bottom-0 w-[2px] bg-brand-gold/10" />
+          <div className="absolute left-6 md:left-1/2 md:-translate-x-1/2 top-0 bottom-0 w-[2px] bg-brand-gold/20" />
           
-          {/* Vertical Line Animated Progress */}
+          {/* Vertical Line Animated Progress (Snapped to Flower) */}
           <motion.div 
-            className="absolute left-6 md:left-1/2 md:-translate-x-1/2 top-0 w-[2px] bg-gradient-to-b from-brand-gold via-brand-gold to-transparent origin-top"
-            initial={{ scaleY: 0 }}
-            whileInView={{ scaleY: 1 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 2, ease: [0.16, 1, 0.3, 1] }}
+            className="absolute left-6 md:left-1/2 md:-translate-x-1/2 top-0 w-[2px] bg-brand-gold origin-top"
             style={{ height: "100%" }}
+            initial={{ scaleY: 0 }}
+            animate={{ scaleY: getProgress(activeIndex, invitationData.timeline.length) }}
+            transition={{ 
+              type: "spring", 
+              stiffness: 60, 
+              damping: 14,
+              mass: 0.8,
+              restDelta: 0.001
+            }}
           />
 
           {invitationData.timeline.map((event, index) => {
@@ -49,7 +76,34 @@ export default function Timeline() {
                     animate={{ scale: [1, 1.5, 1], opacity: [0.5, 0, 0.5] }}
                     transition={{ duration: 2, repeat: Infinity, ease: "easeInOut", delay: index * 0.2 }}
                   />
-                  <div className="w-4 h-4 bg-brand-bg border-4 border-brand-gold rounded-full shadow-[0_0_15px_rgba(201,168,106,0.8)] relative z-10" />
+                  <div className="w-4 h-4 bg-brand-bg border-4 border-brand-gold rounded-full shadow-[0_0_15px_rgba(201,168,106,0.8)] relative z-10 flex items-center justify-center">
+                    {activeIndex === index && (
+                      <motion.div
+                        layoutId="timeline-flower"
+                        className="absolute z-20 pointer-events-none flex items-center justify-center"
+                        initial={{ scale: 0.8 }}
+                        animate={{ scale: 1 }}
+                        transition={{ 
+                          type: "spring", 
+                          stiffness: 60, 
+                          damping: 14,
+                          mass: 0.8,
+                          restDelta: 0.001
+                        }}
+                      >
+                         <span 
+                           className="text-2xl animate-spin drop-shadow-md block" 
+                           style={{ 
+                             animationDuration: '10s', 
+                             lineHeight: 1,
+                             fontFamily: '"Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif'
+                           }}
+                         >
+                           🌸
+                         </span>
+                      </motion.div>
+                    )}
+                  </div>
                 </div>
 
                 {/* Card Container */}
