@@ -35,26 +35,6 @@ export default function Countdown() {
   const [drops, setDrops] = useState<{ id: number, x: number, burstX: number, burstY: number, delay: number, duration: number, size: number, type: 'heart'|'bubble', rotationX: number, rotationY: number, rotationZ: number }[]>([]);
 
   useEffect(() => {
-    if (isRevealed && drops.length === 0) {
-      setDrops(
-        Array.from({ length: 200 }).map((_, i) => ({
-          id: i,
-          x: Math.random() * 100, // Spans entire width of the page
-          burstX: (Math.random() - 0.5) * 400, // horizontal drift
-          burstY: -(Math.random() * 500 + 100), // shoot up initially
-          delay: Math.random() * 0.1, // Almost instant burst
-          duration: Math.random() * 3 + 3, // 3 to 6 seconds total
-          size: Math.random() * 1.5 + 1.0,
-          type: Math.random() > 0.4 ? 'heart' : 'bubble',
-          rotationX: (Math.random() - 0.5) * 540,
-          rotationY: (Math.random() - 0.5) * 540,
-          rotationZ: (Math.random() - 0.5) * 540,
-        }))
-      );
-    }
-  }, [isRevealed, drops.length]);
-
-  useEffect(() => {
     const targetDate = new Date(invitationData.weddingDate).getTime();
 
     const interval = setInterval(() => {
@@ -77,6 +57,25 @@ export default function Countdown() {
   }, []);
 
   // No timeout needed, timer appears below when revealed
+
+  const handleReveal = () => {
+    setIsRevealed(true);
+    setDrops(
+      Array.from({ length: 200 }).map((_, i) => ({
+        id: i,
+        x: Math.random() * 100, // Spans entire width of the page
+        burstX: (Math.random() - 0.5) * 400, // horizontal drift
+        burstY: -(Math.random() * 500 + 100), // shoot up initially
+        delay: Math.random() * 0.1, // Almost instant burst
+        duration: Math.random() * 3 + 3, // 3 to 6 seconds total
+        size: Math.random() * 1.5 + 1.0,
+        type: Math.random() > 0.4 ? 'heart' : 'bubble',
+        rotationX: (Math.random() - 0.5) * 540,
+        rotationY: (Math.random() - 0.5) * 540,
+        rotationZ: (Math.random() - 0.5) * 540,
+      }))
+    );
+  };
 
   const timeBlocks = [
     { label: "Days", value: timeLeft.days },
@@ -142,7 +141,7 @@ export default function Countdown() {
       </motion.div>
 
       <div className="w-full max-w-sm h-[220px]">
-        <ScratchCard onReveal={() => setIsRevealed(true)} text="Scratch to Reveal">
+        <ScratchCard onReveal={handleReveal} text="Scratch to Reveal">
           <motion.div
             className="glass-panel rounded-3xl p-6 w-full h-full flex justify-center items-center shadow-[0_20px_40px_rgba(0,0,0,0.2)] relative overflow-hidden transform-gpu"
             initial={{ opacity: 0, y: 50, rotateX: -30, scale: 0.9 }}

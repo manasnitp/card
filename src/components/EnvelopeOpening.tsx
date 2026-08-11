@@ -37,9 +37,9 @@ export default function EnvelopeOpening({ onOpen }: EnvelopeOpeningProps) {
 
         setTimeout(() => {
           onOpen();
-        }, 1000);
-      }, 5000); // Increased reading time
-    }, 1000); // Trigger pull out just before flap finishes opening
+        }, 500);
+      }, 4000);
+    }, 700);
   };
 
   const envelopeAnim =
