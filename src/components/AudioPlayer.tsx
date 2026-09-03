@@ -9,6 +9,7 @@ export default function AudioPlayer() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
+    let isMounted = true;
     // ─── HOW TO ADD YOUR MUSIC ──────────────────────────────────────────────────
     // 1. Place your MP3 file inside the /public folder
     //    e.g. carf-main/public/wedding-song.mp3
@@ -16,26 +17,29 @@ export default function AudioPlayer() {
     // ────────────────────────────────────────────────────────────────────────────
     const MUSIC_FILE = "/wedding-song.mp3";
 
-    audioRef.current = new Audio(MUSIC_FILE);
-    audioRef.current.loop = true;
-    audioRef.current.volume = 0.5;
-    audioRef.current.onerror = () => {
+    const audio = new Audio(MUSIC_FILE);
+    audioRef.current = audio;
+    audio.loop = true;
+    audio.volume = 0.5;
+    audio.onerror = () => {
       // Silently ignore — music file not yet added to /public
     };
 
     if (isPlaying) {
-      const playPromise = audioRef.current.play();
+      const playPromise = audio.play();
       if (playPromise !== undefined) {
-        playPromise.catch(() => {
-          // Autoplay was blocked or file missing
-          setIsPlaying(false);
+        playPromise.catch((err) => {
+          if (isMounted && err.name !== "AbortError") {
+            setIsPlaying(false);
+          }
         });
       }
     }
 
     return () => {
-      if (audioRef.current) {
-        audioRef.current.pause();
+      isMounted = false;
+      audio.pause();
+      if (audioRef.current === audio) {
         audioRef.current = null;
       }
     };
@@ -45,7 +49,7 @@ export default function AudioPlayer() {
   const togglePlay = () => {
     if (!audioRef.current) return;
 
-    if (isPlaying) {
+    if (!audioRef.current.paused) {
       audioRef.current.pause();
       setIsPlaying(false);
     } else {
@@ -56,7 +60,6 @@ export default function AudioPlayer() {
             setIsPlaying(true);
           })
           .catch(() => {
-            // Music file not found or autoplay blocked — add wedding-song.mp3 to /public
             setIsPlaying(false);
           });
       }
@@ -69,10 +72,11 @@ export default function AudioPlayer() {
       animate={{ opacity: 1, scale: 1 }}
       transition={{ delay: 2, duration: 1 }}
       onClick={togglePlay}
-      className="fixed bottom-6 right-6 md:absolute md:bottom-6 md:right-6 z-40 p-3 rounded-full bg-brand-bg/80 backdrop-blur-md shadow-lg border border-brand-gold/30 text-brand-gold hover:scale-110 active:scale-95 transition-transform"
+      className="fixed bottom-6 right-6 z-50 p-3 rounded-full bg-brand-bg/80 backdrop-blur-md shadow-lg border border-brand-gold/30 text-brand-gold hover:scale-110 active:scale-95 transition-transform"
       aria-label={isPlaying ? "Mute music" : "Play music"}
     >
       {isPlaying ? <Music size={20} /> : <VolumeX size={20} />}
     </motion.button>
+
   );
 }
