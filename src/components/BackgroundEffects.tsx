@@ -10,10 +10,19 @@ const HeartIcon = ({ className, style }: { className?: string, style?: React.CSS
   </svg>
 );
 
+const BubbleIcon = ({ className, style }: { className?: string, style?: React.CSSProperties }) => (
+  <span
+    className={`block rounded-full border border-[#f6b6c8]/55 bg-[#f6b6c8]/10 shadow-[inset_2px_2px_4px_rgba(255,255,255,0.55),0_0_8px_rgba(246,182,200,0.28)] ${className ?? ""}`}
+    style={style}
+  >
+    <span className="block w-1/3 h-1/3 mt-[18%] ml-[18%] rounded-full bg-white/60" />
+  </span>
+);
+
 export default function BackgroundEffects() {
   const [mounted, setMounted] = useState(false);
   const [particles] = useState(() => 
-    Array.from({ length: 20 }).map((_, i) => ({
+    Array.from({ length: 24 }).map((_, i) => ({
       id: i,
       x: Math.random() * 100,
       y: Math.random() * 100,
@@ -25,7 +34,7 @@ export default function BackgroundEffects() {
   );
 
   const [hearts] = useState(() => 
-    Array.from({ length: 15 }).map((_, i) => ({
+    Array.from({ length: 18 }).map((_, i) => ({
       id: `heart-${i}`,
       x: Math.random() * 100,
       y: Math.random() * 100,
@@ -38,6 +47,19 @@ export default function BackgroundEffects() {
     }))
   );
 
+  const [bubbles] = useState(() =>
+    Array.from({ length: 22 }).map((_, i) => ({
+      id: `bubble-${i}`,
+      x: Math.random() * 100,
+      y: Math.random() * 100,
+      size: Math.random() * 18 + 8,
+      duration: Math.random() * 16 + 14,
+      delay: Math.random() * 14,
+      xEnd: Math.random() * 24 - 12,
+      scaleEnd: Math.random() * 0.5 + 0.9,
+    }))
+  );
+
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
@@ -46,19 +68,19 @@ export default function BackgroundEffects() {
   if (!mounted) return null;
 
   return (
-    <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+    <div className="fixed inset-0 pointer-events-none overflow-hidden z-20">
       {/* Ambient Pulsing Light */}
       <motion.div
-        className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-brand-gold/10 via-transparent to-transparent opacity-50 mix-blend-screen"
+        className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#f6b6c8]/12 via-transparent to-transparent opacity-50 mix-blend-screen"
         animate={{ opacity: [0.3, 0.6, 0.3], scale: [1, 1.1, 1] }}
         transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
       />
       
-      {/* Gold Sparkles */}
+      {/* Pink Sparkles */}
       {particles.map((p) => (
         <motion.div
           key={p.id}
-          className="absolute rounded-full bg-brand-gold opacity-40 shadow-[0_0_8px_rgba(201,168,106,0.8)] transform-gpu will-change-transform"
+          className="absolute rounded-full bg-[#f6b6c8] opacity-40 shadow-[0_0_8px_rgba(246,182,200,0.8)] transform-gpu will-change-transform"
           style={{ width: p.size, height: p.size, left: `${p.x}%`, top: `${p.y}%` }}
           animate={{ y: ["0vh", "-100vh"], x: ["0vw", `${p.xEnd}vw`], opacity: [0, 0.8, 0] }}
           transition={{ duration: p.duration, repeat: Infinity, delay: p.delay, ease: "linear" }}
@@ -69,13 +91,13 @@ export default function BackgroundEffects() {
       {hearts.map((h) => (
         <motion.div
           key={h.id}
-          className="absolute text-brand-gold/30 transform-gpu will-change-transform"
+          className="absolute text-[#f6b6c8]/65 transform-gpu will-change-transform"
           style={{ 
             width: h.size, 
             height: h.size, 
             left: `${h.x}%`, 
             top: `${h.y}%`,
-            filter: "drop-shadow(0 2px 4px rgba(201,168,106,0.3))"
+            filter: "drop-shadow(0 2px 4px rgba(246,182,200,0.35))"
           }}
           animate={{ 
             y: ["0vh", "-100vh"], 
@@ -88,8 +110,31 @@ export default function BackgroundEffects() {
           <HeartIcon className="w-full h-full" />
         </motion.div>
       ))}
+
+      {/* Floating Bubbles */}
+      {bubbles.map((bubble) => (
+        <motion.div
+          key={bubble.id}
+          className="absolute text-[#f6b6c8]/65 transform-gpu will-change-transform"
+          style={{
+            width: bubble.size,
+            height: bubble.size,
+            left: `${bubble.x}%`,
+            top: `${bubble.y}%`,
+          }}
+          animate={{
+            y: ["0vh", "-100vh"],
+            x: [0, `${bubble.xEnd}vw`],
+            scale: [0.7, bubble.scaleEnd, 0.85],
+            opacity: [0, 0.5, 0],
+          }}
+          transition={{ duration: bubble.duration, repeat: Infinity, delay: bubble.delay, ease: "linear" }}
+        >
+          <BubbleIcon className="w-full h-full" />
+        </motion.div>
+      ))}
       
-      <div className="absolute inset-0 bg-gradient-to-b from-brand-bg/0 via-brand-bg/40 to-brand-bg pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-brand-bg/5 to-brand-bg/15 pointer-events-none" />
     </div>
   );
 }

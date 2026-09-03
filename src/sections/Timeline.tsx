@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { motion, useScroll, useTransform, useMotionValueEvent } from "framer-motion";
+import { motion, useScroll, useMotionValueEvent } from "framer-motion";
 import { invitationData } from "@/data/invitation";
 
 export default function Timeline() {
@@ -15,7 +15,7 @@ export default function Timeline() {
 
   useMotionValueEvent(scrollYProgress, "change", (latest) => {
     const index = Math.round(latest * (invitationData.timeline.length - 1));
-    setActiveIndex(index);
+    setActiveIndex((currentIndex) => currentIndex === index ? currentIndex : index);
   });
 
   const getProgress = (index: number, total: number) => {
