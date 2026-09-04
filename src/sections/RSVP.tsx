@@ -11,6 +11,7 @@ export default function RSVP() {
     attending: "yes",
     guests: "1",
     arrivalDate: "25 November",
+    attendingReception: "yes",
     message: "",
   });
   const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
@@ -185,6 +186,21 @@ export default function RSVP() {
                   >
                     <option value="25 November">25 November</option>
                     <option value="26 November">26 November</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label htmlFor="attendingReception" className="block text-sm font-medium text-brand-text/80 mb-1 mt-1">Will you attend the Reception (30th Nov)? *</label>
+                  <select
+                    id="attendingReception"
+                    name="attendingReception"
+                    required={formData.attending === "yes"}
+                    value={formData.attendingReception}
+                    onChange={handleChange}
+                    className="w-full bg-white/60 border border-brand-gold/30 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-brand-gold/50 focus:border-transparent transition-all"
+                  >
+                    <option value="yes">Yes, I will attend</option>
+                    <option value="no">No, I won't be able to</option>
                   </select>
                 </div>
               </motion.div>
